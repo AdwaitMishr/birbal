@@ -7,5 +7,5 @@ services:
         POSTGRES_PASSWORD: akbar
         POSTGRES_DB: birbal_db
       ports:
-      - "5432-5432" 
+      - "5432:5432" 
       restart: always
