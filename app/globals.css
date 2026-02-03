@@ -36,10 +36,9 @@
   --sidebar-accent-foreground: #00416a;
   --sidebar-border: #dcd0b9;
   --sidebar-ring: #00416a;
-  --font-sans: 'Cinzel', serif;
   --font-serif: 'Playfair Display', serif;
   --font-mono: 'Geist Mono', monospace;
-  --radius: 0.125rem;
+  --radius: 0.5rem;
   --shadow-x: 0px;
   --shadow-y: 10px;
   --shadow-blur: 15px;
@@ -91,10 +90,9 @@
   --sidebar-accent-foreground: #f4e9d4;
   --sidebar-border: #1e3a5f;
   --sidebar-ring: #0074b7;
-  --font-sans: 'Cinzel', serif;
   --font-serif: 'Playfair Display', serif;
   --font-mono: 'Geist Mono', monospace;
-  --radius: 0.125rem;
+  --radius: 0.5rem;
   --shadow-x: 0px;
   --shadow-y: 15px;
   --shadow-blur: 25px;
@@ -145,7 +143,7 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-cinzel), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono);
   --font-serif: var(--font-serif);
 
@@ -181,4 +179,56 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Floating animation for sign-in page art */
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-20px) rotate(2deg);
+  }
+}
+
+@keyframes float-delayed {
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-15px) rotate(-2deg);
+  }
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-delayed 8s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 4s ease-in-out infinite;
 }
