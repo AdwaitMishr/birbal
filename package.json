@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ai-sdk/react": "^3.0.75",
+    "@openrouter/ai-sdk-provider": "^2.1.1",
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
     "@radix-ui/react-use-controllable-state": "^1.2.2",
@@ -17,7 +19,7 @@
     "@streamdown/math": "^1.0.1",
     "@streamdown/mermaid": "^1.0.1",
     "@tanstack/react-query": "^5.90.20",
-    "ai": "^6.0.69",
+    "ai": "^6.0.73",
     "better-auth": "^1.4.18",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -36,6 +38,7 @@
     "streamdown": "^2.1.0",
     "tailwind-merge": "^3.4.0",
     "use-stick-to-bottom": "^1.1.2",
+    "zod": "^4.3.6",
     "zustand": "^5.0.11"
   },
   "devDependencies": {
