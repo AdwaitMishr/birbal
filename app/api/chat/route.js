@@ -2,6 +2,7 @@ import { CHAT_SYSTEM_PROMPT } from "@/lib/prompt";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { MessageRole, MessageType } from "@prisma/client";
 import { convertToModelMessages, streamText } from "ai";
+import db from "@/lib/db";
 
 const provider = createOpenRouter({
   apiKey: process.env.OPENROUTER_API_KEY,
@@ -46,12 +47,12 @@ export async function POST(req) {
       skipUserMessage,
     } = await req.json();
     const previousMessages = chatId
-      ? await db.message.findMany({
+      ? await db.messages.findMany({
           where: {
             chatId: chatId,
           },
           orderBy: {
-            createAt: "asc",
+            createdAt: "asc",
           },
         })
       : [];
@@ -114,7 +115,7 @@ export async function POST(req) {
             });
           }
           if (messageToSave.length > 0) {
-            await db.message.createMany({
+            await db.messages.createMany({
               data: messageToSave,
             });
           }
