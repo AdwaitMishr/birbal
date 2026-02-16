@@ -7,8 +7,8 @@ const ChatMessageView = ({user}) => {
 
     const [selectedMessage , setSelectedMessage] = useState("")
 
-const handleMessageSelect = (messsage)=>{
-    setSelectedMessage(messsage)
+const handleMessageSelect = (message)=>{
+    setSelectedMessage(message)
 }
 
 const handleMessageChange = ()=>{

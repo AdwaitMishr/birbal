@@ -14,6 +14,7 @@ import {
   PromptInput,
   PromptInputBody,
   PromptInputButton,
+  PromptInputFooter,
   PromptInputSubmit,
   PromptInputTextarea,
   PromptInputTools,
@@ -150,93 +151,106 @@ export const MessageWithForm = ({ chatId }) => {
   const messageToRender = [...initialMessages, ...messages];
 
   return (
-    <div className="max-w-4xl mx-auto p-6 relative size-full h-[calc(100vh-4rem)]">
-      <div className="flex flex-col h-full">
-        <Conversation className={"h-full"}>
-          <ConversationContent>
+    <div className="max-w-5xl mx-auto p-4 relative size-full h-[calc(100vh-4rem)] flex flex-col">
+      <div className="flex-1 overflow-hidden min-h-0">
+        <Conversation className="h-full">
+          <ConversationContent className="pb-4">
             {messageToRender.length === 0 ? (
-              <>
-                <div className="flex items-center justify-center h-full text-gray-500">
-                  Start a coversation...
-                </div>
-              </>
+              <div className="flex h-full flex-col items-center justify-center text-muted-foreground opacity-50">
+                <p className="text-lg font-serif">
+                  Start a conversation with Birbal...
+                </p>
+              </div>
             ) : (
-              messageToRender.map((msg) => (
-                <Fragment key={msg.id}>
-                  {" "}
+              messageToRender.map((msg, idx) => (
+                <Fragment key={msg.id || idx}>
                   {msg.parts.map((part, i) => {
-                    switch (part.type) {
-                      case "text":
-                        return (
-                          <Message from={msg.role} key={`${msg.id}-${i}`}>
-                            <MessageContent>
-                              <MessageResponse>{part.text}</MessageResponse>
-                            </MessageContent>
-                          </Message>
-                        );
-                      case "reasoning":
-                        return (
-                          <Reasoning
-                            className="max-w-2xl px-4 py-4 border border-muted rounded-md bg-muted/50"
-                            key={`${msg.id} - ${i}`}
-                          >
-                            <ReasoningTrigger />
-                            <ReasoningContent
-                              className={
-                                "mt-2 italic font-light text-muted-foreground"
-                              }
-                            ></ReasoningContent>
-                          </Reasoning>
-                        );
+                    if (part.type === "text") {
+                      return (
+                        <Message from={msg.role} key={`${msg.id}-${i}`}>
+                          <MessageContent>
+                            <MessageResponse>{part.text}</MessageResponse>
+                          </MessageContent>
+                        </Message>
+                      );
                     }
+                    return null;
                   })}
                 </Fragment>
               ))
             )}
+
             {status === "streaming" && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Spinner />
-                <span className="text-sm">Birbal is thinking...</span>
+              <div className="flex items-center gap-2 px-4 py-2 text-muted-foreground animate-pulse">
+                <Spinner className="h-4 w-4" />
+                <span className="text-sm font-medium">
+                  Birbal is thinking...
+                </span>
               </div>
             )}
           </ConversationContent>
           <ConversationScrollButton />
         </Conversation>
-        <PromptInput onSubmit={handleSubmit} className={"mt-4"}>
-          <PromptInputBody>
+      </div>
+
+      <div className="mt-4 pb-4">
+        <PromptInput
+          onSubmit={handleSubmit}
+          className="w-full border rounded-xl bg-background shadow-lg overflow-hidden transition-all focus-within:ring-1 focus-within:ring-primary/30"
+        >
+          <PromptInputBody className="p-0 relative">
             <PromptInputTextarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask Birbal and he shall answer..."
+              className="w-full min-h-20 max-h-75 p-4 text-base resize-none focus:outline-none bg-transparent text-foreground placeholder:text-muted-foreground/60"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit();
+                }
+              }}
             />
           </PromptInputBody>
-          <div className="flex flex-col items-center justify-center">
-            <PromptInputTools className={"flex items-center gap-2"}>
+
+          <PromptInputFooter className="flex items-center justify-between p-3 bg-muted/20 border-t">
+            <PromptInputTools className="flex items-center gap-2">
               {isModelLoading ? (
-                <Spinner />
+                <Spinner className="h-4 w-4" />
               ) : (
                 <ModelSelector
-                  models={models?.models}
+                  models={models?.models || []}
                   selectedModelId={selectedModel}
                   onModelSelect={setSelectedModel}
                 />
               )}
+
               {status === "streaming" ? (
-                <PromptInputButton onClick={handleStop}>
+                <PromptInputButton
+                  onClick={handleStop}
+                  className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                >
                   <StopCircleIcon size={16} />
-                  <span>Stop</span>
+                  <span className="text-xs font-medium">Stop</span>
                 </PromptInputButton>
               ) : (
                 messageToRender.length > 0 && (
-                  <PromptInputButton onClick={handleRetry}>
+                  <PromptInputButton
+                    onClick={handleRetry}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
                     <RotateCcwIcon size={16} />
-                    <span>Retry</span>
+                    <span className="text-xs font-medium">Retry</span>
                   </PromptInputButton>
                 )
               )}
             </PromptInputTools>
-            <PromptInputSubmit status={status} />
-          </div>
+            <PromptInputSubmit
+              status={status}
+              disabled={!input.trim() || status === "streaming"}
+              className="ml-auto"
+            />
+          </PromptInputFooter>
         </PromptInput>
       </div>
     </div>

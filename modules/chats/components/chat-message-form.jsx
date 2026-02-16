@@ -27,7 +27,7 @@ const ChatMessageForm = ({ initialMessage, onMessageChange }) => {
       await mutateAsync({ content: message, model: selectedModel });
       toast.success("Message Sent Successfully");
     } catch (error) {
-      console.log(error);
+      console.error("Error sending message:", error);
       toast.error("Erron in sending message");
     } finally {
       setMessage("");
@@ -42,6 +42,7 @@ const ChatMessageForm = ({ initialMessage, onMessageChange }) => {
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Type your message here..."
             className="min-h-20 max-h-50 resize-none border-0 bg-transparent px-5 py-4 text-base focus-visible:ring-0 focus-visible:ring-offset-0"
+            autoFocus
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();

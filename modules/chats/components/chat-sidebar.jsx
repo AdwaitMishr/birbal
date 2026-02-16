@@ -17,21 +17,30 @@ import { cn } from "@/lib/utils";
 import {
   PlusIcon,
   SearchIcon,
-  MenuIcon,
   EllipsisIcon,
   Trash,
+  Pencil,
+  MessageSquare,
 } from "lucide-react";
 import { useChatStore } from "../store/chat-store";
 import DeleteChatModel from "./chat-delete-model";
+import RenameChatModel from "./rename-chat-model";
 
 const ChatSidebar = ({ user, chats }) => {
   const { activeChatId } = useChatStore();
-  const [selectedChatId, setSelectedChatId] = useState(null);
-  const [isModelOpen, setIsModelOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [activeModal, setActiveModal] = useState({
+    type: null, // 'delete' | 'rename' | null
+    chatId: null,
+    title: "",
+  });
+
+  const closeModals = () =>
+    setActiveModal({ type: null, chatId: null, title: "" });
+
   const filteredChats = useMemo(() => {
-    if(!chats || !Array.isArray(chats)) return null;
+    if (!chats || !Array.isArray(chats)) return [];
     if (!searchQuery.trim()) return chats;
 
     const query = searchQuery.toLowerCase();
@@ -76,11 +85,16 @@ const ChatSidebar = ({ user, chats }) => {
     return groups;
   }, [filteredChats]);
 
-  const onDelete = (e, chatId) => {
+  const onOpenDelete = (e, chat) => {
     e.preventDefault();
     e.stopPropagation();
-    setSelectedChatId(chatId);
-    setIsModelOpen(true);
+    setActiveModal({ type: "delete", chatId: chat.id, title: chat.title });
+  };
+
+  const onOpenRename = (e, chat) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setActiveModal({ type: "rename", chatId: chat.id, title: chat.title });
   };
 
   const renderChatList = (chatList) => {
@@ -88,45 +102,51 @@ const ChatSidebar = ({ user, chats }) => {
 
     return chatList.map((chat) => (
       <Fragment key={chat.id}>
-      <Link
-        href={`/chat/${chat.id}`}
-        className={cn(
-          "block rounded-lg px-3 py-2 text-sm text-sidebar-foreground hover:bg-sidebar-accent transition-colors",
-          chat.id === activeChatId && "bg-sidebar-accent",
-        )}
-      >
-        <div className="flex felx-row justify-between items-center gap-2">
-          <span className="truncate flex-1">{chat.title}</span>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 group-hover:opacity-100 hover:bg-sidebar-accent-foreground/10"
-                onClick={(e) => e.preventDefault()}
-              >
-                <EllipsisIcon className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="flex flex-row gap-2 cursor-pointer"
-                onClick={(e) => onDelete(e, chat.id)}
-              >
-                <Trash className="h-4 w-4 text-red-500" />
-                <span className="text-red-500">Delete</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </Link>
-      <DeleteChatModel
-      chatId={chat.id}
-      isModelOpen={isModelOpen}
-      setIsModelOpen={setIsModelOpen}
-      />
+        <Link
+          href={`/chat/${chat.id}`}
+          className={cn(
+            "block rounded-lg px-3 py-2 text-sm text-sidebar-foreground hover:bg-sidebar-accent transition-colors group relative",
+            chat.id === activeChatId && "bg-sidebar-accent",
+          )}
+        >
+          <div className="flex flex-row justify-between items-center gap-2">
+            <span className="truncate flex-1">{chat.title}</span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    "h-6 w-6 opacity-0 group-hover:opacity-100 hover:bg-sidebar-accent-foreground/10 transition-opacity",
+                    chat.id === activeChatId && "opacity-100",
+                  )}
+                  onClick={(e) => e.preventDefault()}
+                >
+                  <EllipsisIcon className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem
+                  className="cursor-pointer gap-2"
+                  onClick={(e) => onOpenRename(e, chat)}
+                >
+                  <Pencil className="h-4 w-4 text-muted-foreground" />
+                  <span>Rename</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="flex flex-row gap-2 cursor-pointer text-red-500 focus:text-red-500 focus:bg-red-50"
+                  onClick={(e) => onOpenDelete(e, chat)}
+                >
+                  <Trash className="h-4 w-4" />
+                  <span>Delete</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </Link>
       </Fragment>
     ));
   };
@@ -134,6 +154,7 @@ const ChatSidebar = ({ user, chats }) => {
   const handleSeacrhQuery = (e) => {
     setSearchQuery(e.target.value);
   };
+
   return (
     <div className="flex h-full w-72 flex-col border-r border-border bg-sidebar">
       <div className="flex items-center justify-between border-b border-sidebar-border px-5 py-4">
@@ -170,8 +191,18 @@ const ChatSidebar = ({ user, chats }) => {
 
       <div className="flex-1 overflow-y-auto px-3">
         {filteredChats?.length === 0 ? (
-          <div className="text-center text-sm text-muted-foreground py-8">
-            {searchQuery ? "No Chats Founds" : "No Chats Yet"}
+          <div className="flex flex-col items-center justify-center text-center py-12 px-4 gap-3">
+            <MessageSquare className="h-10 w-10 text-muted-foreground/40" />
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                {searchQuery ? "No chats found" : "No chats yet"}
+              </p>
+              <p className="text-xs text-muted-foreground/60 italic mt-1">
+                {searchQuery
+                  ? `No results for "${searchQuery}"`
+                  : "Start a new conversation to begin"}
+              </p>
+            </div>
           </div>
         ) : (
           <>
@@ -217,6 +248,18 @@ const ChatSidebar = ({ user, chats }) => {
       <div className="p-4 flex items-center gap-3 border-t border-sidebar-border bg-sidebar-accent/50">
         <UserButton user={user} />
       </div>
+
+      <DeleteChatModel
+        chatId={activeModal.chatId}
+        isModelOpen={activeModal.type === "delete"}
+        setIsModelOpen={closeModals}
+      />
+      <RenameChatModel
+        chatId={activeModal.chatId}
+        currentTitle={activeModal.title}
+        isOpen={activeModal.type === "rename"}
+        onClose={closeModals}
+      />
     </div>
   );
 };

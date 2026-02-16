@@ -67,7 +67,7 @@ export async function POST(req) {
     let modelMessages;
 
     try {
-      modelMessages = convertToModelMessages(allMessages);
+      modelMessages = await convertToModelMessages(allMessages);
     } catch (conversionError) {
       modelMessages = allMessages
         .map((msg) => ({

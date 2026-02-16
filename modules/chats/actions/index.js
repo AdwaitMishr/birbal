@@ -63,20 +63,23 @@ export const getChatById = async (chatId) => {
     const chat = await db.chat.findUnique({
       where: {
         id: chatId,
-        userId: user.id
+        userId: user.id,
       },
-      include:{
+      include: {
         messages: true,
-
-      }
+      },
     });
     return {
       success: true,
-      message:"Chat fetched Successfully",
-      data: chat
-    }
+      message: "Chat fetched Successfully",
+      data: chat,
+    };
   } catch (error) {
-    
+    console.error("Error fetching chat:", error);
+    return {
+      success: false,
+      message: "Failed to fetch chat",
+    };
   }
 };
 
@@ -90,12 +93,15 @@ export const getAllChats = async () => {
       };
     }
 
-    const chats = await db.chat?.findMany({
+    const chats = await db.chat.findMany({
       where: {
         userId: user.id,
       },
-      include: {
-        messages: true,
+      select: {
+        id: true,
+        title: true,
+        model: true,
+        createdAt: true,
       },
       orderBy: {
         createdAt: "desc",
@@ -151,6 +157,42 @@ export const deleteChat = async (chatId) => {
     return {
       success: false,
       message: "Unable to delete chat",
+    };
+  }
+};
+
+export const renameChat = async ({ chatId, title }) => {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return {
+        success: false,
+        message: "Unauthorized User",
+      };
+    }
+    if (!title || !title.trim()) {
+      return { success: false, message: "Title cannot be empty" };
+    }
+    const updatedChat = await db.chat.update({
+      where: {
+        id: chatId,
+        userId: user.id,
+      },
+      data: {
+        title: title.trim(),
+      },
+    });
+    revalidatePath("/");
+    return {
+      success: true,
+      message: "Chat renamed successfully",
+      data: updatedChat,
+    };
+  } catch (error) {
+    console.error("Error renaming chat:", error);
+    return {
+      success: false,
+      message: "Failed to rename chat",
     };
   }
 };

@@ -41,12 +41,12 @@ const Model = ({
 
         {showFooter && (
           <DialogFooter>
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" onClick={onClose} className="transition-all duration-200">
               {cancelText}
             </Button>
             {onSubmit && (
               <Button
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200"
                 onClick={handleSubmit}
               >
                 {submitText}

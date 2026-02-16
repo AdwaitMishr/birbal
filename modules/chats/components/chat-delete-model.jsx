@@ -1,19 +1,17 @@
 "use client";
 
-const { toast } = require("sonner");
-const { useDeleteChat } = require("../hooks/chat");
-const { default: Model } = require("./model");
+import { toast } from "sonner";
+import { useDeleteChat } from "../hooks/chat";
+import Model from "./model";
 
 const DeleteChatModel = ({ isModelOpen, setIsModelOpen, chatId }) => {
   const { mutateAsync, isPending } = useDeleteChat(chatId);
   const handleDelete = async () => {
     try {
       await mutateAsync();
-      toast.success("Chat Deleted Successfully");
       setIsModelOpen(false);
     } catch (error) {
-      toast.error("Failed to Delete Chat");
-      console.error("Failed ", error);
+      // Error toast is handled by the hook's onError
     }
   };
   return (
@@ -35,3 +33,4 @@ const DeleteChatModel = ({ isModelOpen, setIsModelOpen, chatId }) => {
 };
 
 export default DeleteChatModel;
+

@@ -26,7 +26,7 @@ export function ModelSelector({
   const [selectedForDetails, setSelectedForDetails] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const selectedModel = models.find((m) => m.id === selectedModelId);
+  const selectedModel = models?.find((m) => m.id === selectedModelId);
   const formatContextLength = (length) => {
     if (length === null || length === undefined) return "Unknown";
     if (length >= 1000000) return `${(length / 1000000).toFixed(1)}M`;
@@ -76,7 +76,7 @@ export function ModelSelector({
             <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className={"w-3xl p=0"} align="start">
+        <PopoverContent className={"w-3xl p-0"} align="start">
           <div className="p-3 border-b">
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
